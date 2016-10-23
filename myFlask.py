@@ -102,3 +102,13 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('show_entries'))
 
+@app.route('/test')
+def hello():
+    return render_template('hello.html')
+
+@app.route('/blog')
+def blog_main():
+    return render_template('blog/main.html')
+
+
+
