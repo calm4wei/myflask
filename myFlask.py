@@ -18,7 +18,7 @@ app.config.update(dict(
     DEBUG=True,
     SECRET_KEY='development key',
     USERNAME='admin',
-    PASSWORD='default'
+    PASSWORD='admin'
 ))
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
@@ -91,8 +91,10 @@ def login():
             error = 'Invalid password'
         else:
             session['logged_in'] = True
+            session['username'] = request.form['username']
             flash('You were logged in')
-            return redirect(url_for('show_entries'))
+            # return redirect(url_for('show_entries'))
+            return redirect(url_for('show_admin'))
     return render_template('login.html', error=error)
 
 
@@ -102,13 +104,40 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('show_entries'))
 
+# ==================================
+
 @app.route('/test')
 def hello():
     return render_template('hello.html')
 
+@app.route('/admin')
+def show_admin():
+    db = get_db()
+    cur = db.execute('select * from blogs ORDER BY create_date')
+    blogs = cur.fetchall()
+    cur = db.execute('select * from catagories ORDER BY create_date')
+    catagories = cur.fetchall()
+    return render_template('admin/admin.html', blogs=blogs, catas=catagories)
+
 @app.route('/blog')
 def blog_main():
     return render_template('blog/main.html')
+
+@app.route('/admin/add/blog')
+def add_blog():
+    if not session.get('logged_in'):
+        abort(401)
+    db = get_db()
+    db.execute('insert into blogs (title, content, create_date, c_id) values (?, ?, ?, ?)',
+               [request.form['title'], request.form['content'], request.form['create_date'],request.form['c_id']])
+    db.commit()
+    flash('New blog was successfully posted')
+    return redirect(url_for('/admin/show/blog'))
+
+@app.route('/admin/show/blog')
+def show_blog():
+    return
+
 
 
 
