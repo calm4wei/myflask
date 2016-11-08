@@ -1,9 +1,21 @@
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+
+    <title>博客管理</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link type="text/css" rel="Stylesheet" href="http://c.csdnimg.cn/pig/blog/write/css/main.css"/>
+    <link rel="stylesheet" href="http://c.csdnimg.cn/public/common/toolbar/css/index.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}"/>
-    <meta charset="UTF-8">
-    <title>admin</title>
+
+    <script type="text/javascript" src="http://static.blog.csdn.net/scripts/jquery.js"></script>
+    <script type="text/javascript" src="http://static.blog.csdn.net/scripts/jquery-version.js"></script>
+    <script type="text/javascript" src="http://static.blog.csdn.net/scripts/csdn.js"></script>
+    <script type="text/javascript" src="http://c.csdnimg.cn/pig/blog/write/scripts/master.js"></script>
+    <script type="text/javascript">var statichost = "http://static.blog.csdn.net";</script>
+
 </head>
+
 <body>
 <header>
     <!-- navbar -->
@@ -11,15 +23,7 @@
         <div class="container">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                        data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
                 <a class="navbar-brand" href="/admin">博客管理</a>
-
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -36,37 +40,130 @@
     </nav>
 </header>
 
-<div id="main_content" class="container main">
+<div id="wrap">
 
-    <div>
-        <ul class="nav nav-tabs" role="tablist">
-            <li id="article" role="presentation" class="active"><a href="#">文章管理</a></li>
-            <li id="cata_type" role="presentation"><a href="#">类别管理</a></li>
-            <li id="comment" role="presentation"><a href="#">评论管理</a></li>
-            <li id="draft" role="presentation"><a href="#">草稿箱</a></li>
-            <li role="presentation"><a href="#">回收站</a></li>
+    {#    <div class="head">#}
+    {#        <div style="float:right; margin-top:5px; color:Red;">#}
+    {#        </div>#}
+    {#    </div>#}
+
+
+    <div class="tabs_header">
+        <ul id="ul_tab" class="tabs" style="width:120%">
+            <li class="active"><a href="/postlist"><span>文章管理</span></a></li>
+            <li><a href="/category"><span>类别管理</span></a></li>
+            <li><a href="/feedback"><span>评论管理</span></a></li>
+            <li><a href="/configure"><span>
+                    博客配置</span></a>
+            </li>
+
+            <li><a href="/configure/column"><span>博客栏目</span></a></li>
+            <li><a href="/postlist/0/all/draft"><span>草稿箱</span></a></li>
+            <li><a href="/postlist/0/all/deleted"><span>回收站</span></a></li>
+
+            <li id="btn_postedit" class="write"><a href="/postedit" class="t_button" target="_blank">写新文章</a></li>
+            <li id="btn_import" class="write" style="margin:5px 0 0 2px"><a href="/import" class="t_button">博客搬家</a>
+            </li>
         </ul>
     </div>
+{#    <script type="text/javascript">setTab();</script>#}
 
-    <div>
+    {#    <script type='text/javascript' src='/content/scripts/postlist.js?v=1.1'></script>#}
+
+    <div id="sel_div" class="h_status">
+        类别：<select id="selCat">
+        <option value="0">全部&nbsp;&nbsp;&nbsp;&nbsp;</option>
+        <option value='6399229'>Linux&Shell脚本 (1)</option>
+        <option value='6399235'>Hadoop&Spark&Kafka&Storm (1)</option>
+        <option value='6399239'>算法&数据挖掘 (0)</option>
+        <option value='5616945'>开发工具 (0)</option>
+        <option value='6424045'>Scala (1)</option>
+        <option value='6424046'>数据库 (1)</option>
+    </select>
+        类型：<select id="selType">
+        <option value="all">全部&nbsp;&nbsp;&nbsp;&nbsp;</option>
+        <option value="original">原创</option>
+        <option value="repost">转载</option>
+        <option value="translated">翻译</option>
+    </select>&nbsp;
+        属性:<select id="selBoleArticle">
+        <option value="">请选择&nbsp;&nbsp;&nbsp;&nbsp;</option>
+        <option value="allbole">全部&nbsp;&nbsp;&nbsp;&nbsp;</option>
+        <option value="allcomment">@博乐文章</option>
+        <option value="otherbole">其他文章</option>
+    </select>
+
+    </div>
+    <div id="datagrid_test">
         <table id="lstBox" class="table table-striped">
+            <thead>
+            <tr>
+                <th>标题</th>
+                <th>点击量</th>
+                <th>评论</th>
+                <th>创建日期</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+
             {%- for row in blogs %}
                 <tr>
-                    {%- for column in row %}
+                    {%- for column in row if not column.id%}
                         <td>{{ column }}</td>
                     {%- endfor %}
                 </tr>
             {%- endfor %}
         </table>
     </div>
+    <div class="page_nav"><span> 4条  共1页</span><strong>1</strong></div>
 
-    <div>
+    <div id="setcat_div" style="display:none;">
+        <div class="frame">
+            <input name="close" type="button" class="close" onclick="cancel_cat()">
+
+            <div id="setcat_box"></div>
+            <p style="text-align:center;">
+                <input type="button" value="确定" class="btn_01" onclick="save_cat()"/>
+            </p>
+        </div>
     </div>
+
+    <script type="text/javascript">
+        $(function () {
+            $("#lstBox tr").each(function () {
+                var tr = $(this);
+                if (tr.text().indexOf("待审核") > -1) {
+                    var tds = $(tr.find("td")[5]);
+                    var a = $(tds.find("a"));
+                    a.each(function () {
+                        if ($(this).text().indexOf("置顶") > -1) {
+                            $(this).remove();
+                            tds.html(tds.html().replace("|  |", "|"));
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
 </div>
+
+
+{#<script type="text/javascript" src="http://c.csdnimg.cn/rabbit/cnick/cnick.js"></script>#}
+{##}
+{#<script type="text/javascript">#}
+{#    document.write('<script type="text/javascript" src="http://c.csdnimg.cn/pubfooter/js/publib_footer.js?' + Math.floor(new Date() / 120000).toString(36) + '="></' + 'script>');#}
+{#</script>#}
+{##}
+{#<script type="text/javascript">document.write("<img src=http://counter.csdn.net/pv.aspx?id=342 border=0 width=0 height=0>");</script>#}
+{#<script type="text/javascript" src="http://www.csdn.net/ui/scripts/Csdn/counter.js"></script>#}
+{#<!--new top-->#}
+{##}
+{#<script id="csdn-toolbar-id" btnId="header_notice_num" wrapId="note1" count="5" subCount="5" type="text/javascript"#}
+{#        src="http://c.csdnimg.cn/public/common/toolbar/js/toolbar.js"></script>#}
+{#<!--new top-->#}
+
+
 </body>
-<script type="text/javascript">
-
-    $(document).unbind()
-
-</script>
 </html>

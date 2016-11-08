@@ -5,8 +5,8 @@
 
 import os
 from sqlite3 import dbapi2 as sqlite3
-from flask import Flask, request, session, g, redirect, url_for, abort, \
-     render_template, flash
+from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+from flask.ext.pagedown import PageDown
 
 
 # create our little application :)
@@ -113,7 +113,7 @@ def hello():
 @app.route('/admin')
 def show_admin():
     db = get_db()
-    cur = db.execute('select * from blogs ORDER BY create_date')
+    cur = db.execute('select title, hit, comment_count,create_date, status, c_id from blogs ORDER BY create_date')
     blogs = cur.fetchall()
     cur = db.execute('select * from catagories ORDER BY create_date')
     catagories = cur.fetchall()
@@ -122,6 +122,10 @@ def show_admin():
 @app.route('/blog')
 def blog_main():
     return render_template('blog/main.html')
+
+@app.route('/postedit')
+def postEdit():
+    return render_template('admin/editor.html')
 
 @app.route('/admin/add/blog')
 def add_blog():
